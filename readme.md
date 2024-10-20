@@ -1,6 +1,5 @@
 # Cursor Bridge for Obsidian
 
-![Cursor Bridge](https://path-to-your-logo-image.png)
 
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/lengff123/Cursor-bridge)](https://github.com/lengff123/Cursor-bridge/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/lengff123/Cursor-bridge)](https://github.com/lengff123/Cursor-bridge/blob/main/LICENSE)
