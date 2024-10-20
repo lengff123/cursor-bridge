@@ -2,9 +2,9 @@
   "id": "cursor-bridge",
   "name": "Cursor Bridge",
   "version": "1.0.0",
-  "minAppVersion": "0.12.0",
-  "description": "Seamlessly bridge Obsidian and Cursor, the AI-powered code editor. Elevate your coding workflow by opening notes directly in Cursor, bringing the power of AI to your knowledge base.",
+  "minAppVersion": "0.15.0",
+  "description": "Seamlessly bridge Obsidian and Cursor, the AI-powered code editor.",
   "author": "Adam Cloud",
-  "authorUrl": "https://github.com/lengff123/Cursor-bridge",
+  "authorUrl": "https://github.com/lengff123",
   "isDesktopOnly": true
 }
