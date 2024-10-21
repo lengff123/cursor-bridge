@@ -1,0 +1,11 @@
+# 忽略编译后的 JavaScript 文件
+*.js
+
+# 忽略 node_modules 目录
+node_modules/
+
+# 忽略日志文件
+*.log
+
+# 忽略环境变量文件
+.env
