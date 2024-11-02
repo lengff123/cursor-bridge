@@ -1,53 +1,42 @@
-import { Plugin, TFolder, TFile, Modal, Setting, App, Notice, TAbstractFile } from 'obsidian';
+import { Plugin, TFolder, TFile, Modal, Setting, App, Notice, TAbstractFile , FileSystemAdapter} from 'obsidian';
 import { exec } from 'child_process';
 import * as path from 'path';
 
 export default class VSCodeProjectPlugin extends Plugin {
     async onload() {
-        console.log('加载 Cursor Project Plugin');
-
-        // 添加一个侧边栏按钮
+  
         this.addRibbonIcon('folder', 'Open in Cursor', () => {
             new FileSelectionModal(this.app, this).open();
         });
     }
 
-    onunload() {
-        console.log('卸载 Cursor Project Plugin');
-    }
-
     async openInVSCode(paths: string[]) {
-        const vscodeCommand = 'Cursor'; // Cursor 命令行工具
+        const vscodeCommand = 'Cursor'; // Cursor 
+
+
+        // Get vault path using FileSystemAdapter
+        const adapter = this.app.vault.adapter;
+        const vaultPath = adapter instanceof FileSystemAdapter ? adapter.getBasePath() : '';
+        if (!vaultPath) {
+            new Notice('Unable to get vault path');
+            return;
+        }
         
-        // 获取 Obsidian 库的根路径
-        const vaultPath = this.app.vault.adapter.basePath;
-        console.log('Vault root path:', vaultPath);
+        const convertPath = (p: string) => path.join(vaultPath, p);
         
-        // 转换路径
-        const convertPath = (p: string) => {
-            const fullPath = path.join(vaultPath, p);
-            console.log(`Converting path: "${p}" to "${fullPath}"`);
-            return fullPath;
-        };
         
-        // 分离文件和目录
         const directories = paths.filter(p => this.app.vault.getAbstractFileByPath(p) instanceof TFolder);
         const files = paths.filter(p => this.app.vault.getAbstractFileByPath(p) instanceof TFile);
         
-        console.log('Selected directories:', directories);
-        console.log('Selected files:', files);
 
-        // 如果有目录，只打开第一个目录
         if (directories.length > 0) {
             const fullPath = convertPath(directories[0]);
             const command = `${vscodeCommand} --new-window "${fullPath}"`;
-            console.log('Opening directory:', fullPath);
-            console.log('Executing command:', command);
+
             
             exec(command, (error, stdout, stderr) => {
                 if (error) {
-                    console.error(`执行错误: ${error}`);
-                    new Notice('打开 Cursor 失败');
+                    new Notice('Failed to open in Cursor');
                     return;
                 }
                 if (stderr) {
@@ -56,10 +45,10 @@ export default class VSCodeProjectPlugin extends Plugin {
                 if (stdout) {
                     console.log(`stdout: ${stdout}`);
                 }
-                new Notice('已在 Cursor 中打开目录');
+                new Notice('Directory opened in Cursor');
             });
         } else if (files.length > 0) {
-            // 如果没有目录但有文件，打开所有选中的文件
+             // If no directories are selected but files exist, open all selected files
             const fullPaths = files.map(convertPath);
             const command = `${vscodeCommand} --new-window ${fullPaths.map(p => `"${p}"`).join(' ')}`;
             console.log('Opening files:', fullPaths);
@@ -67,20 +56,13 @@ export default class VSCodeProjectPlugin extends Plugin {
             
             exec(command, (error, stdout, stderr) => {
                 if (error) {
-                    console.error(`执行错误: ${error}`);
-                    new Notice('打开 Cursor 失败');
+                    new Notice('Failed to open in Cursor');
                     return;
                 }
-                if (stderr) {
-                    console.error(`stderr: ${stderr}`);
-                }
-                if (stdout) {
-                    console.log(`stdout: ${stdout}`);
-                }
-                new Notice('已在 Cursor 中打开文件');
+                new Notice('Files opened in Cursor');
             });
         } else {
-            new Notice('未选择任何文件或目录');
+            new Notice('No files or directories selected');
         }
     }
 }
@@ -97,15 +79,14 @@ class FileSelectionModal extends Modal {
     onOpen() {
         const { contentEl } = this;
         contentEl.empty();
-        contentEl.createEl('h2', { text: '选择文件和目录' });
+        contentEl.createEl('h2', { text: 'Select Files and Directories' });
 
         this.renderFileList(contentEl);
 
         new Setting(contentEl)
         .addButton(button => button
-            .setButtonText('在 Cursor 中打开')
+            .setButtonText('Open in Cursor')
             .onClick(() => {
-                console.log('Selected paths:', Array.from(this.selectedPaths)); // 添加这行
                 this.plugin.openInVSCode(Array.from(this.selectedPaths));
                 this.close();
             }));
@@ -132,12 +113,12 @@ class FileSelectionModal extends Modal {
             const folderCheckbox = folderDiv.createEl('input', { type: 'checkbox' });
             folderCheckbox.addEventListener('change', () => {
                 if (folderCheckbox.checked) {
-                    // 当选中文件夹时，添加文件夹路径而不是文件路径
+                    // When folder is selected, add folder path instead of file paths
                     this.selectedPaths.add(folderPath);
                 } else {
                     this.selectedPaths.delete(folderPath);
                 }
-                // 更新所有子文件的选中状态
+                // Update all child file checkbox states
                 const childCheckboxes = folderDiv.querySelectorAll('input[type="checkbox"]');
                 childCheckboxes.forEach((cb: HTMLInputElement) => {
                     cb.checked = folderCheckbox.checked;
@@ -145,7 +126,7 @@ class FileSelectionModal extends Modal {
                 });
             });
     
-            folderDiv.createEl('span', { text: folderPath || '根目录', cls: 'file-tree-folder-name' });
+            folderDiv.createEl('span', { text: folderPath || 'Root', cls: 'file-tree-folder-name' });
     
             fileTree[folderPath].forEach(file => {
                 const fileDiv = folderDiv.createEl('div', {
@@ -168,10 +149,7 @@ class FileSelectionModal extends Modal {
         });
     }
     getFullPath(file: TAbstractFile): string {
-        if (file instanceof TFile) {
-            return this.app.vault.getAllLoadedFiles().find(f => f.path === file.path)?.path || file.path;
-        } 
-        throw new Error('Unsupported file type');
+        return file.path;
     }
 
     onClose() {
