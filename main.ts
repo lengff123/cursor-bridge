@@ -1,8 +1,9 @@
 import { Plugin, TFolder, TFile, Modal, Setting, App, Notice, TAbstractFile , FileSystemAdapter} from 'obsidian';
 import { exec } from 'child_process';
 import * as path from 'path';
+import * as os from 'os';
 
-export default class VSCodeProjectPlugin extends Plugin {
+export default class CursorProjectPlugin extends Plugin {
     async onload() {
   
         this.addRibbonIcon('folder', 'Open in Cursor', () => {
@@ -10,8 +11,8 @@ export default class VSCodeProjectPlugin extends Plugin {
         });
     }
 
-    async openInVSCode(paths: string[]) {
-        const vscodeCommand = 'Cursor'; // Cursor 
+    async openInCursor(paths: string[]) {
+        const CursorCommand = 'Cursor'; // Cursor 
 
 
         // Get vault path using FileSystemAdapter
@@ -28,10 +29,13 @@ export default class VSCodeProjectPlugin extends Plugin {
         const directories = paths.filter(p => this.app.vault.getAbstractFileByPath(p) instanceof TFolder);
         const files = paths.filter(p => this.app.vault.getAbstractFileByPath(p) instanceof TFile);
         
+        const isMacOS = os.platform() === 'darwin';
 
         if (directories.length > 0) {
             const fullPath = convertPath(directories[0]);
-            const command = `${vscodeCommand} --new-window "${fullPath}"`;
+            const command = isMacOS 
+                ? `open -a ${CursorCommand} "${fullPath}"`
+                : `${CursorCommand} --new-window "${fullPath}"`;
 
             
             exec(command, (error, stdout, stderr) => {
@@ -50,7 +54,9 @@ export default class VSCodeProjectPlugin extends Plugin {
         } else if (files.length > 0) {
              // If no directories are selected but files exist, open all selected files
             const fullPaths = files.map(convertPath);
-            const command = `${vscodeCommand} --new-window ${fullPaths.map(p => `"${p}"`).join(' ')}`;
+            const command = isMacOS 
+                ? `open -a ${CursorCommand} ${fullPaths.map(p => `"${p}"`).join(' ')}`
+                : `${CursorCommand} --new-window ${fullPaths.map(p => `"${p}"`).join(' ')}`;
             console.log('Opening files:', fullPaths);
             console.log('Executing command:', command);
             
@@ -68,10 +74,10 @@ export default class VSCodeProjectPlugin extends Plugin {
 }
 
 class FileSelectionModal extends Modal {
-    plugin: VSCodeProjectPlugin;
+    plugin: CursorProjectPlugin;
     selectedPaths: Set<string> = new Set();
 
-    constructor(app: App, plugin: VSCodeProjectPlugin) {
+    constructor(app: App, plugin: CursorProjectPlugin) {
         super(app);
         this.plugin = plugin;
     }
@@ -87,7 +93,7 @@ class FileSelectionModal extends Modal {
         .addButton(button => button
             .setButtonText('Open in Cursor')
             .onClick(() => {
-                this.plugin.openInVSCode(Array.from(this.selectedPaths));
+                this.plugin.openInCursor(Array.from(this.selectedPaths));
                 this.close();
             }));
     }
