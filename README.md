@@ -92,4 +92,4 @@ If you find this plugin helpful, consider buying me a coffee! Your support helps
 
 ---
 
-Happy coding and note-taking! 🚀📚
+Happy test coding and note-taking! 🚀📚
