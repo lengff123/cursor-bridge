@@ -15,6 +15,7 @@ Seamlessly bridge Obsidian and Cursor, the AI-powered code editor. Elevate your 
 - 🔄 **Seamless Integration**: Effortlessly switch between your knowledge base and coding environment
 - 📁 **Folder Support**: Open entire project folders from Obsidian in Cursor
 - ⚙️ **Customizable Workflow**: Tailor the plugin to fit your unique development process
+- It already supports Windows and Apple systems
 
 ## 🎥 See It in Action
 
