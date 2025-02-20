@@ -91,9 +91,11 @@ If you find this plugin helpful, consider buying me a coffee! Your support helps
 
 <a href="https://www.buymeacoffee.com/your_username" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
 
+---
 
 - Wechat
+  
   <img src="assets/wechat-qr.png" width="200" alt="微信打赏码">
----
+
 
 Happy test coding and note-taking! 🚀📚
