@@ -97,5 +97,5 @@ If you find this plugin helpful, consider buying me a coffee! Your support helps
   
   <img src="assets/wechat-qr.png" width="200" alt="微信打赏码">
 
-
+---
 Happy test coding and note-taking! 🚀📚
